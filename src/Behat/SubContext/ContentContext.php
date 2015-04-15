@@ -159,10 +159,13 @@ class ContentContext extends SubContext
           switch($entityType) {
             case 'node':
               $subqueue->eq_node[LANGUAGE_NONE][] = array('target_id' => $id);
+              break;
             case 'fieldable_panels_pane':
               $subqueue->eq_fieldable_panels_pane[LANGUAGE_NONE][] = array('target_id' => $id);
+              break;
             default:
-              throw new \Exception("$entityTypeLabel cannot be added to an entityqueue at this time.");
+              throw new \Exception("Entity type $entityTypeLabel cannot be added to an entityqueue at this time.");
+              break;
           }
           entityqueue_subqueue_save($subqueue);
         }
