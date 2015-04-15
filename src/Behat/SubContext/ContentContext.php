@@ -145,16 +145,12 @@ class ContentContext extends SubContext
     $entityType = $this->getEntityTypeFromLabel($entityTypeLabel);
     $entityqueID = $this->getSubqueueID($entityqueueLabel);
     $subqueue = entityqueue_subqueue_load($entityqueID);
-    echo("subqueue1\n");
-    var_dump($subqueue);
     foreach ($this->content as $entityType => $bundles) {
       $entityInfo = entity_get_info($entityType);
       $idProperty = $entityInfo['entity keys']['id'];
       foreach ($bundles as $bundleType => $entities) {
         foreach ($entities as $entity) {
           $id = $entity->$idProperty->value();
-          echo("id\n");
-          var_dump($id);
           // TODO account for all entity types.
           switch($entityType) {
             case 'node':
@@ -178,7 +174,6 @@ class ContentContext extends SubContext
       ->condition('es.label', $name)
       ->fields('es', array('subqueue_id'));
     $result = $query->execute()->fetchField();
-    var_dump($result);
     return ($result);
   }
 
