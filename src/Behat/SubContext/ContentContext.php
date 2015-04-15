@@ -136,6 +136,27 @@ class ContentContext extends SubContext
     throw new \Exception("Use from first to tenth ordinal numbers.");
   }
 
+
+  /**
+   * @Given /^(?:that|those) "([^"]*)" ([\w ]+) is in the "([^"]*)" entityqueue$/
+   */
+  public function thatFieldablePanelPaneIsInTheEntityqueue($bundleLabel, $entityTypeLabel, $entityqueueLabel) {
+    var_dump($bundleLabel);
+    var_dump($entityTypeLabel);
+    $subqueue = entityqueue_subqueue_load($entityqueueLabel);
+    $wrappers = $this->getWrappers($bundleLabel, $entityTypeLabel);
+    //var_dump($wrappers);
+    foreach ($wrappers as $wrapper) {
+      echo("wrapper\n");
+      var_dump($wrapper);
+      $id = $wrappers[$entityLabel]->getIdentifier();
+      echo("id\n");
+      var_dump($id);
+      //$subqueue->eq_node[LANGUAGE_NONE][] = array('target_id' => $id);
+      //entityqueue_subqueue_save($subqueue);
+    }
+  }
+
   /**
    * @Given /^(?:that|those) "([^"]*)" ([\w ]+) (?:has|have) "([^"]*)" set to "([^"]*)"$/
    */
