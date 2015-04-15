@@ -136,25 +136,47 @@ class ContentContext extends SubContext
     throw new \Exception("Use from first to tenth ordinal numbers.");
   }
 
-
+  
   /**
    * @Given /^(?:that|those) "([^"]*)" ([\w ]+) is in the "([^"]*)" entityqueue$/
    */
-  public function thatFieldablePanelPaneIsInTheEntityqueue($bundleLabel, $entityTypeLabel, $entityqueueLabel) {
-    var_dump($bundleLabel);
-    var_dump($entityTypeLabel);
-    $subqueue = entityqueue_subqueue_load($entityqueueLabel);
-    $wrappers = $this->getWrappers($bundleLabel, $entityTypeLabel);
-    //var_dump($wrappers);
-    foreach ($wrappers as $wrapper) {
-      echo("wrapper\n");
-      var_dump($wrapper);
-      $id = $wrappers[$entityLabel]->getIdentifier();
-      echo("id\n");
-      var_dump($id);
-      //$subqueue->eq_node[LANGUAGE_NONE][] = array('target_id' => $id);
-      //entityqueue_subqueue_save($subqueue);
+  public function addEntityToQueue($bundleLabel, $entityTypeLabel, $entityqueueLabel) {
+    $entityTypeLabel = $this->removePluralFromLabel($entityTypeLabel);
+    $entityType = $this->getEntityTypeFromLabel($entityTypeLabel);
+    $entityqueID = $this->getSubqueueID($entityqueueLabel);
+    $subqueue = entityqueue_subqueue_load($entityqueID);
+    echo("subqueue1\n");
+    var_dump($subqueue);
+    foreach ($this->content as $entityType => $bundles) {
+      $entityInfo = entity_get_info($entityType);
+      $idProperty = $entityInfo['entity keys']['id'];
+      foreach ($bundles as $bundleType => $entities) {
+        foreach ($entities as $entity) {
+          $id = $entity->$idProperty->value();
+          echo("id\n");
+          var_dump($id);
+          // TODO account for all entity types.
+          switch($entityType) {
+            case 'node':
+              $subqueue->eq_node[LANGUAGE_NONE][] = array('target_id' => $id);
+            case 'fieldable_panels_pane':
+              $subqueue->eq_fieldable_panels_pane[LANGUAGE_NONE][] = array('target_id' => $id);
+            default:
+              throw new \Exception("$entityTypeLabel cannot be added to an entityqueue at this time.");
+          }
+          entityqueue_subqueue_save($subqueue);
+        }
+      }
     }
+  }
+
+  public function getSubqueueID($name) {
+    $query = db_select('entityqueue_subqueue', 'es')
+      ->condition('es.label', $name)
+      ->fields('es', array('subqueue_id'));
+    $result = $query->execute()->fetchField();
+    var_dump($result);
+    return ($result);
   }
 
   /**
